@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Input</title>
+</head>
+<body>
+<h1>輸入數字</h1>
+<form id="numberForm">
+    <input type="number" id="numberInput" required>
+    <button type="submit">確認</button>
+</form>
+
+<h1>操作</h1>
+<button id="showContent">內容</button>
+<button id="calculateSum">輸出總和並清除</button>
+
+<h2>結果</h2>
+<div id="output"></div>
+
+<script>
+    // 前端 JavaScript 代碼，用來與 Django 後端 API 進行互動
+    document.getElementById('numberForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const number = document.getElementById('numberInput').value;
+
+        const response = await fetch('/add-number/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ number: number })
+        });
+
+        if (response.ok) {
+            alert('數字已儲存');
+            document.getElementById('numberInput').value = '';
+        } else {
+            alert('儲存失敗');
+        }
+    });
+
+    document.getElementById('showContent').addEventListener('click', async function() {
+        const response = await fetch('/show-content/');
+        const data = await response.json();
+        document.getElementById('output').innerText = data.numbers.join(', ');
+    });
+
+    document.getElementById('calculateSum').addEventListener('click', async function() {
+        const response = await fetch('/calculate-sum/');
+        const data = await response.json();
+        document.getElementById('output').innerText = `總和: ${data.sum}`;
+    });
+</script>
+</body>
+</html>
